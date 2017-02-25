@@ -126,6 +126,22 @@ void myfree(void * x, char * file, int line) {
 		printf("Error freeing memory in %s, line %d: Pointer is not in the heap", file, line);
 		return;
 	}
+	
+	//Sets metadata node to free
+	ptr=(Node *)((char*)ptr+sizeof(Node) - (*ptr).size);
+	ptr->state = 0;
+	
+	Node * curr, next;
+	curr = (Node *) myblock;
+	
+	//Merges all free blocks with each other by traversing through all blocks
+	while((Node *)((char*)curr+sizeof(Node) - (*curr).size) != NULL) {
+		if(curr->state == 0) {
+			next = (Node *)((char*)curr+sizeof(Node) - (*curr).size);
+			curr->state += next->size + sizeof(Node);
+		}
+		curr = (Node *)((char*)curr+sizeof(Node) - (*curr).size);
+	}
 
 	
 
@@ -150,21 +166,3 @@ int isValidEntry(Node * ptr){
 
 	return isValid;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
