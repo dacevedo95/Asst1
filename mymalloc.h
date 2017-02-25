@@ -8,7 +8,11 @@ void * mymalloc(size_t size, char* file, int line);
 
 void myfree(void * x, char * file, int line);
 
-typedef struct NodeStruct Node;
+typedef struct NodeStruct {
+	short size;
+	char state;
+} Node;
+
 
 void intializeMyBlock ();
 

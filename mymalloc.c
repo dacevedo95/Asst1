@@ -83,7 +83,7 @@ void * mymalloc(size_t size, char* file, int line) {
 			(*next).state=0;
 
 			//Return ptr
-			return (void *) ptr;
+			return (void *) (ptr+1);
 		} 
 
 		/*If there is only enough room in the current block to allocate the inputted size,
@@ -91,7 +91,7 @@ void * mymalloc(size_t size, char* file, int line) {
 		*/
 		else if(originalSize>=size){
 			(*ptr).state=1;
-			return (void *) ptr;
+			return (void *) (ptr+1);
 		}
 			
 		
@@ -104,65 +104,108 @@ void * mymalloc(size_t size, char* file, int line) {
 
 }
 
-void myfree(void * x, char * file, int line) {
-
-	//If p is null, an error message is printed since it is not possile to free a null pointer
-	if(x == NULL) {
-		printf("Error freeing memory in %s, line %d: Cannot free null pointer", file, line);
-		return;
-	}
-
-	//Creates a pointer of type 'Node'
-	Node * ptr = (Node *)((char *)x - sizeof(Node));
-
-	//Checks if the pointer is already freed
-	if(ptr->state == '0') {
-		printf("Error freeing memory in %s, line %d: Pointer has no memory allocated", file, line);
-		return;	
-	}
-
-	//Checks to see if the pointer is within the heap
-	if(isValidEntry(ptr) == 0) {
-		printf("Error freeing memory in %s, line %d: Pointer is not in the heap", file, line);
-		return;
-	}
-	
-	//Sets metadata node to free
-	ptr=(Node *)((char*)ptr+sizeof(Node) - (*ptr).size);
-	ptr->state = 0;
-	
-	Node * curr, next;
-	curr = (Node *) myblock;
-	
-	//Merges all free blocks with each other by traversing through all blocks
-	while((Node *)((char*)curr+sizeof(Node) - (*curr).size) != NULL) {
-		if(curr->state == 0) {
-			next = (Node *)((char*)curr+sizeof(Node) - (*curr).size);
-			curr->state += next->size + sizeof(Node);
-		}
-		curr = (Node *)((char*)curr+sizeof(Node) - (*curr).size);
-	}
-
-	
-
-}
-
 /* This is a helper method to determine whether a pointer is within the heap.
  * It uses a for loop to traverse through the simulated memory and checks if
  * the pointer is equal to that entry. If it is the function returns '1'. If
  * not the function returns '0'
 */
 int isValidEntry(Node * ptr){
-
 	int isValid = 0;
 
 	int i;
-	for(i = 0; i < (5000/sizeof(Node)); i++) {
-		if(ptr == myblock[i]) {
+	for(i = 0; i < (5000 ); i++) {
+		char * head=(char *)myblock;
+		if((char*)ptr == (head+i)) {
 			isValid = 1;
 			break;
 		}
 	}
-
 	return isValid;
 }
+
+void myfree(void * x, char * file, int line) {
+	//If p is null, an error message is printed since it is not possile to free a null pointer
+	if(x == NULL) {
+		printf("Error freeing memory in %s, line %d: Cannot free null pointer\n", file, line);
+		return;
+	}
+
+	//Creates a pointer of type 'Node'
+	Node * ptr = (Node *)((char *)x - sizeof(Node));
+
+
+	//Checks to see if the pointer is within the heap
+	if(isValidEntry(ptr) == 0) {
+		printf("Error freeing memory in %s, line %d: Pointer is not in the heap\n", file, line);
+		return;
+	}
+
+	//Checks if the pointer is already freed
+	if(ptr->state == 0) {
+		printf("Error freeing memory in %s, line %d: Pointer has no memory allocated\n", file, line);
+		return;	
+	}
+	//Free ptr
+	ptr->state=0;
+
+	//Get the metadata after ptr
+	Node * next= (Node*)((char*)ptr+sizeof(Node) + ptr->size);
+
+	int nextValidEntry=isValidEntry(next);
+	//If the next pointer is valid and also not in use, combine
+	if(nextValidEntry==1&&next->state==0) {
+		ptr->size=ptr->size + sizeof(Node) + next->size;
+	}
+
+	Node * curr=(Node*) myblock;
+	Node * prev;
+
+	if(curr==ptr) {
+		return;
+	}
+
+	//Find the metadata before ptr
+	while(curr!=ptr) {
+		/*printf("start size: %d\n",((Node*) myblock)->size);
+		printf("curr: %d\n",curr);
+		printf("ptr: %d\n",ptr);*/
+		prev=curr;
+		curr=(Node*)((char*)curr + sizeof(Node) + curr->size); 
+	}
+
+	//If the metadata prev pointer is free, combine
+	if(prev->state==0) {
+		prev->size=prev->size+sizeof(Node)+ptr->size;
+	}
+
+
+
+
+
+
+	/*//Sets metadata node to free
+	ptr=(Node *)((char*)ptr+sizeof(Node) - (*ptr).size);
+	ptr->state = 0;*/
+
+	
+
+
+
+
+	/*Node * curr;
+	Node * next;
+	curr = (Node *) myblock;
+	
+	//Merges all free blocks with each other by traversing through all blocks
+	while((Node *)((char*)curr+sizeof(Node) - (*curr).size) != NULL) {
+		if(curr->state == 0) {
+			next = (Node *)((char*)curr+sizeof(Node) + (*curr).size);
+			curr->state += next->size + sizeof(Node);
+		}
+		curr = (Node *)((char*)curr+sizeof(Node) - (*curr).size);
+	}*/
+
+	
+
+}
+
