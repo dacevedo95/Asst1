@@ -17,7 +17,7 @@ typedef struct NodeStruct {
 //intializes the char array to be used to simulate dynamic memory
 static char myblock[5000];
 
-//boolean to determine wether myblock has been intialized
+//boolean to determine whether myblock has been intialized
 static bool myblockIntialized=false;
 
 //Initializes the memory block
@@ -152,6 +152,7 @@ void myfree(void * x, char * file, int line) {
 	Node * next= (Node*)((char*)ptr+sizeof(Node) + ptr->size);
 
 	int nextValidEntry=isValidEntry(next);
+	
 	//If the next pointer is valid and also not in use, combine
 	if(nextValidEntry==1&&next->state==0) {
 		ptr->size=ptr->size + sizeof(Node) + next->size;

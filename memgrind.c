@@ -98,7 +98,7 @@ double workloadC() {
 			numPointers++;
 		} 
 
-		/* Esle if the random number is 1 and there is at least 1 active
+		/* Else if the random number is 1 and there is at least 1 active
 		pointer, free the most recently allocated pointer and decrease 
 		the count of active pointers. Increase the free operations count
 		*/
