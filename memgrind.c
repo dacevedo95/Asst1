@@ -11,6 +11,7 @@
 double workloadA() {
 
 	struct timeval  tv1, tv2;
+	int i;
 
 	//Start time
 	gettimeofday(&tv1, NULL);
@@ -19,12 +20,12 @@ double workloadA() {
 	char * pointers[1000];
 
 	//Make 1000 malloc calls of 1 byte
-	for(int i=0;i<1000;i++) {
+	for(i=0;i<1000;i++) {
 		pointers[i]=malloc(1);
 	}
 
 	//Free all the pointers
-	for (int i = 0; i < 1000; ++i ){
+	for (i = 0; i < 1000; ++i ){
 		free(pointers[i]);
 	}
 
@@ -40,11 +41,12 @@ double workloadA() {
 */
 double workloadB() {
 	struct timeval  tv1, tv2;
+	int i;
 
 	//Start time
 	gettimeofday(&tv1, NULL);
 
-	for(int i=0;i<1000;i++) {
+	for(i=0;i<1000;i++) {
 		char * temp=malloc(1);
 		free(temp);
 	}
@@ -208,6 +210,7 @@ Then, pointers are randomly selected from the array to be freed.
 */
 double workloadE() {
 	struct timeval  tv1, tv2;
+	int i;
 
 	//Start time
 	gettimeofday(&tv1, NULL);
@@ -216,7 +219,7 @@ double workloadE() {
 	char * pointers[1000];
 
 	//Make 1000 malloc calls of 1 byte
-	for(int i=0;i<1000;i++) {
+	for(i=0;i<1000;i++) {
 		pointers[i]=malloc(1);
 	}
 
@@ -258,6 +261,7 @@ and then all the pointers are eventually freed.
 */
 double workloadF() {
 	struct timeval  tv1, tv2;
+	int i;
 
 	//Start time
 	gettimeofday(&tv1, NULL);
@@ -274,7 +278,7 @@ double workloadF() {
 	//Number of non-freed pointers
 	int numPointers=0;
 
-	for(int i=0;i<1000;i++) {
+	for(i=0;i<1000;i++) {
 		pointers[i]=NULL;
 	}
 
@@ -341,13 +345,14 @@ to the workload function for the specified type.
 */
 void executeWorkLoad(char name, double (*functionPtr)(void)) {
 	double workloadTime[100];
+	int i;
 
 	//Count of total time for all iterations
 	double workloadTimeCount=0;
 
 	printf("Beginning 100 iterations of workload %c.\n", name);
 
-	for(int i=0;i<100;i++) {
+	for(i=0;i<100;i++) {
 
 		//Execution time of each iteration
 		double executionTime=(*functionPtr)();
