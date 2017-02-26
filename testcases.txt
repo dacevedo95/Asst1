@@ -1,0 +1,37 @@
+testcases.txt - Kyle Thakker and David Acevedo
+
+Workload E
+----------
+
+ This workload calls malloc for 1 byte 1000 times and stores the pointers in an array. It then randomly chooses an index 
+ of the array to try to free a pointer from. After freeing the pointer, the value at the index of the array is set to NULL.
+ If the pointer at the chosen index was already freed, the value of the array at that index would be NULL, and the program
+ would contiue the loop and generate a new random number. The program eventually frees all 1000 pointers and returns
+ how long the workload took to run.
+
+ This workload was included to make sure that the program was capable of freeing pointers in any order. In the previous 
+ workloads, the pointers were freed in some sort of predefined order. In this test, the order in which the pointers are freed
+ is random. The randomness of the order in which the pointers are freed tests the programs ability to combine consecutive chunks
+ of unused memory into one large chunk.
+
+ Workload F
+ ----------
+
+ This workload chooses randomly between mallocing 1 byte or freeing a pointer. First, the program initializes all elements of a 10000
+ char * array to be NULL. If the program decides to malloc, it generates a random number to decide where to store the pointer in the array. 
+ If this spot is already full, then the program will revert back to deciding whether to malloc  or free a pointer. If the program succesfully 
+ mallocs 1 byte, a char is stored at that pointer. The value of the char is set to be the ASCII value of the index at which the 
+ pointer is to be stored in the array % 26. 26 is just an arbitrary number. The actual character that the ASCII value represents is 
+ unimportant. The idea behind initializing the char is to make sure that the program does not overwrite the data of previouly malloced memory. 
+ If the program decides to free, it also makes sure that the number of active pointers is greater than 0 so that it does not try to free 
+ nonexistant or NULL pointers. It then randomly chooses a location in the array to free a pointer from. If the value at this index is NULL,
+ the ptr was already freed or was never allocated and stored at that index. Thus, the program will revert back to deciding whether to malloc
+ or free. Otherwise, the program checks to make sure that the value at that index was not altered. It does this by checking to see if the value
+ at the pointer is equal to the index of the array % 26. If this is not the case, the program will print out an error message. The pointer is
+ then freed and the value at the index of the array is set to NULL. The program calls malloc 1000 times. All pointers are eventually freed.
+ Then the length of time the workload took to run is returned.
+
+ This workload was included to make sure that the program did not alter the data stored in memory previously allocated. It does this by making
+ sure that the char stored in the memory pointed to by a pointer is still there when the pointer is freed. Additionally, this workload introduces 
+ a large amount of randomness. This randomness ensures that the workload rigourously tests the mymalloc and myfree functions' ability to allocate
+ and free memory without altering the data stored in memory that was already allocated.
